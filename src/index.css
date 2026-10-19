@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Aref+Ruqaa:wght@700&display=swap');
+@import "tailwindcss";
+
+/* تعريف ألوان اللوجو في Tailwind v4 */
+@theme {
+  --color-brand-dark: #2b0000;      /* خلفية الموقع */
+  --color-brand-maroon: #4a0404;    /* لون اللوجو الأساسي */
+  --color-brand-maroon-light: #5c0000;
+  --color-brand-gold: #f5a623;      /* الأصفر الذهبي */
+  --color-brand-gold-light: #ffc85c;
+  --color-brand-card: #3a0202;      /* الكروت */
+  --color-brand-white: #fdfbf7;     /* نصوص */
+  
+  --font-sans: "Cairo", sans-serif;
+  --font-arabic: "Aref Ruqaa", serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  direction: rtl;
+  background-color: var(--color-brand-dark);
+  color: var(--color-brand-white);
+}
+
+/* تخصيص السكرول بار */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-brand-dark); }
+::-webkit-scrollbar-thumb { background: var(--color-brand-maroon-light); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-brand-gold); }
+
+@layer components {
+  /* زر ذهبي احترافي */
+  .btn-gold {
+    @apply bg-gradient-to-l from-brand-gold to-yellow-500 text-brand-dark font-bold px-6 py-3 rounded-xl hover:scale-105 transition-all shadow-lg hover:shadow-brand-gold/40 flex items-center justify-center gap-2;
+  }
+  
+  /* كارت بلون المارون مع حدود ذهبية */
+  .card-glass {
+    @apply bg-brand-card border border-brand-gold/20 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300;
+  }
+  
+  /* حقول الإدخال */
+  .input-field {
+    @apply w-full bg-brand-maroon/50 border border-brand-gold/20 rounded-xl px-4 py-3 text-brand-white placeholder-gray-400 focus:border-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/30 transition-all;
+  }
+}
