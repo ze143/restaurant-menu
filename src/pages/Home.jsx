@@ -65,17 +65,28 @@ export default function Home() {
           <h2 className="text-4xl font-arabic text-brand-gold text-center mb-8">
             احنا مين؟
           </h2>
-          <p className="text-gray-300 leading-loose text-lg text-center">
-            من سنة 1979 والحكاية بدأت، يومها كان اسمنا الأمانة، ومع السنين اتغير
-            الاسم، لكن عمر الطعم ولا الجودة ما اتغيروا. النهارده{" "}
-            <span className="text-brand-gold font-bold">عبدالحي الكبابجي</span>{" "}
-            بقى اسم له تاريخ، وثقة بناها جيل ورا جيل. وسعنا المكان، وكبرنا عشان
-            نستقبلكم بأفضل خدمة، لكن فضلنا محافظين على نفس الوصفة، ونفس الجودة،
-            ونفس الطعم اللي الناس بتحبه من أكتر من 45 سنة.
-            <br />
-            ❤️🔥 عبدالحي الكبابجي حكاية بدأت من زمان، ولسه مستمرة معاكم في كل
-            لقمة.
-          </p>
+          <div className="text-gray-300 leading-loose text-lg text-center">
+            <p>
+              من سنة 1979 والحكاية بدأت، يومها كان اسمنا الأمانة، ومع السنين
+              اتغير الاسم، لكن عمر الطعم ولا الجودة ما اتغيروا.
+              <br />
+              النهارده{" "}
+              <span className="text-brand-gold font-bold">
+                عبدالحي الكبابجي
+              </span>{" "}
+              بقى اسم له تاريخ، وثقة بناها جيل ورا جيل.
+              <br />
+              وسعنا المكان، وكبرنا عشان نستقبلكم بأفضل خدمة، لكن فضلنا محافظين
+              على نفس الوصفة، ونفس الجودة، ونفس الطعم اللي الناس بتحبه من أكتر
+              من 45 سنة.
+            </p>
+
+            {/* السطر الأخير مع الإيموجي على الشمال */}
+            <div className="text-center mt-4 font-bold text-brand-gold">
+              عبدالحي الكبابجي حكاية بدأت من زمان، ولسه مستمرة معاكم في كل لقمة.
+              ❤️🔥
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -128,7 +139,7 @@ export default function Home() {
             <div className="bg-white/5 p-4 rounded-xl">
               <p className="font-bold text-white mb-1">💳 انستا باي</p>
               <p className="text-sm text-gray-400">
-                IPAN: sayedabdalhay@instapay
+              sayedabdalhay@instapay
               </p>
               <p className="text-sm text-brand-gold">01122980014</p>
             </div>
@@ -245,7 +256,6 @@ export default function Home() {
           </a>
         </div>
         <div className="flex items-center justify-center gap-2 text-lg text-gray-300">
-          <FiPhone className="text-brand-gold" />
           <span>01143709888 - 01150015782</span>
         </div>
       </section>

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const SERVICES = {
   takeaway: {
-    label: "تيك أواي", icon: FiShoppingBag, color: "text-blue-400",
+    label: "تيك أواي", icon: FiShoppingBag,
     fields: [
       { key: "takeaway_cleanliness", label: "النظافة", hint: "مكان التجهيز" },
       { key: "takeaway_quality", label: "جودة الأكل", hint: "الطعم والنضارة" },
@@ -18,7 +18,7 @@ const SERVICES = {
     ],
   },
   dinein: {
-    label: "الصالة", icon: GiForkKnifeSpoon, color: "text-green-400",
+    label: "الصالة", icon: GiForkKnifeSpoon,
     fields: [
       { key: "dinein_cleanliness", label: "نظافة الصالة", hint: "أرضيات وطاولات" },
       { key: "dinein_quality", label: "جودة الأكل", hint: "طعم ونضارة" },
@@ -30,7 +30,7 @@ const SERVICES = {
     ],
   },
   delivery: {
-    label: "الدليفري", icon: FiTruck, color: "text-yellow-400",
+    label: "الدليفري", icon: FiTruck,
     fields: [
       { key: "delivery_cleanliness", label: "نظافة الأكل", hint: "نظيف وخالي من شوائب" },
       { key: "delivery_quality", label: "جودة الأكل", hint: "طعم ونضارة" },
@@ -53,8 +53,8 @@ function StarRating({ value, onChange, large }) {
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          className={`${large ? "text-4xl" : "text-2xl"} transition hover:scale-110 ${
-            value >= n ? "text-brand-gold" : "text-white/20"
+          className={`${large ? "text-4xl" : "text-3xl"} transition hover:scale-110 ${
+            value >= n ? "text-brand-gold" : "text-gray-600"
           }`}
         >★</button>
       ))}
@@ -76,7 +76,6 @@ export default function Ratings() {
 
   async function submit(e) {
     e.preventDefault();
-    // Validation
     for (const f of fields) {
       if (!scores[f.key]) return toast.error(`قيّم "${f.label}" أولاً`);
     }
@@ -108,7 +107,6 @@ export default function Ratings() {
 
       if (error) throw error;
 
-      // Insert details
       const details = {};
       fields.forEach((f) => { details[f.key] = scores[f.key]; });
       details.general_mood = general.mood;
@@ -170,7 +168,7 @@ export default function Ratings() {
                 onClick={() => { setService(key); setScores({}); }}
                 className={`py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition ${
                   active
-                    ? "bg-brand-red text-white shadow-lg"
+                    ? "bg-brand-maroon text-white shadow-lg border border-brand-gold/30"
                     : "text-gray-400 hover:bg-white/5"
                 }`}
               >
@@ -184,11 +182,13 @@ export default function Ratings() {
           {/* Service Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {fields.map((f) => (
-              <div key={f.key} className="card-glass p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <FiStar className="text-brand-gold" />
-                  <span className="font-bold text-white">{f.label}</span>
-                  <span className="text-xs text-gray-500 mr-auto">{f.hint}</span>
+              <div key={f.key} className="bg-brand-card border border-brand-gold/20 rounded-xl p-4 flex flex-col justify-between">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 text-brand-gold font-bold mb-1">
+                    <FiStar />
+                    <span>{f.label}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">{f.hint}</p>
                 </div>
                 <StarRating
                   value={scores[f.key] || 0}
@@ -199,8 +199,8 @@ export default function Ratings() {
           </div>
 
           {/* General */}
-          <div className="card-glass p-6 space-y-5">
-            <h3 className="text-2xl font-arabic text-brand-gold">رأيك العام</h3>
+          <div className="bg-brand-card border border-brand-gold/20 rounded-xl p-6 space-y-6">
+            <h3 className="text-2xl font-arabic text-brand-gold border-b border-brand-gold/20 pb-3">رأيك العام</h3>
 
             <div>
               <label className="block text-sm text-gray-400 mb-2">التقييم العام *</label>
@@ -242,11 +242,17 @@ export default function Ratings() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input className="input-field" placeholder="الاسم (اختياري)"
-                value={general.name} onChange={(e) => setGeneral({ ...general, name: e.target.value })} />
-              <input className="input-field" placeholder="رقم الهاتف (اختياري)" type="tel"
-                value={general.phone} onChange={(e) => setGeneral({ ...general, phone: e.target.value })} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">الاسم (اختياري)</label>
+                <input className="input-field" placeholder="اسمك"
+                  value={general.name} onChange={(e) => setGeneral({ ...general, name: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">رقم الهاتف (اختياري)</label>
+                <input className="input-field" placeholder="01xxxxxxxxx" type="tel"
+                  value={general.phone} onChange={(e) => setGeneral({ ...general, phone: e.target.value })} />
+              </div>
             </div>
           </div>
 
