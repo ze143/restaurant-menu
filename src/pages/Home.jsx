@@ -7,9 +7,8 @@ import {
   FiTruck,
   FiPhone,
   FiInstagram,
-  FaWhatsapp,
 } from "react-icons/fi";
-import { FaTiktok, FaFacebook, FaWhatsapp} from "react-icons/fa";
+import { FaTiktok, FaFacebook, FaWhatsapp } from "react-icons/fa";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 
@@ -27,7 +26,7 @@ export default function Home() {
           <img
             src="/img/Asset-2.ico"
             alt="logo"
-            className="w-12 h-12 rounded-full border-2 border-brand-gold object-cover"
+            className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full border-4 border-brand-gold object-cover shadow-[0_0_40px_rgba(245,166,35,0.3)] mb-6"
           />
 
           <h1 className="text-5xl md:text-7xl font-arabic text-brand-gold mb-4 drop-shadow-xl">
@@ -81,7 +80,6 @@ export default function Home() {
               من 45 سنة.
             </p>
 
-            {/* السطر الأخير مع الإيموجي على الشمال */}
             <div className="text-center mt-4 font-bold text-brand-gold">
               عبدالحي الكبابجي حكاية بدأت من زمان، ولسه مستمرة معاكم في كل لقمة.
               ❤️🔥
@@ -122,6 +120,7 @@ export default function Home() {
             className="w-full h-64 rounded-xl border-0"
             allowFullScreen
             loading="lazy"
+            title="موقعنا على الخريطة"
           />
           <div className="flex gap-4 mt-4 text-sm text-gray-400">
             <span>🛍️ تيك أواي</span>
@@ -138,9 +137,7 @@ export default function Home() {
           <div className="space-y-4">
             <div className="bg-white/5 p-4 rounded-xl">
               <p className="font-bold text-white mb-1">💳 انستا باي</p>
-              <p className="text-sm text-gray-400">
-              sayedabdalhay@instapay
-              </p>
+              <p className="text-sm text-gray-400">sayedabdalhay@instapay</p>
               <p className="text-sm text-brand-gold">01122980014</p>
             </div>
             <div className="bg-white/5 p-4 rounded-xl">
@@ -256,6 +253,7 @@ export default function Home() {
           </a>
         </div>
         <div className="flex items-center justify-center gap-2 text-lg text-gray-300">
+          <FiPhone className="text-brand-gold" />
           <span>01143709888 - 01150015782</span>
         </div>
       </section>
