@@ -252,12 +252,15 @@ export default function Home() {
             <FaFacebook />
           </a>
         </div>
-        <div className="flex items-center justify-center gap-2 text-lg text-gray-300">
-          <FiPhone className="text-brand-gold" />
-          <span>01143709888</span>
-          <br/>
-          <FiPhone className="text-brand-gold" />
-          <span>01150015782</span>
+        <div className="flex flex-col items-center justify-center gap-3 text-lg text-gray-300">
+          <div className="flex items-center gap-2">
+            <FiPhone className="text-brand-gold" />
+            <span>01143709888</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiPhone className="text-brand-gold" />
+            <span>01150015782</span>
+          </div>
         </div>
       </section>
 
