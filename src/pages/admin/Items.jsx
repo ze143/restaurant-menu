@@ -19,8 +19,7 @@ export default function Items() {
   const filtered = useMemo(() => {
     return items.filter((i) => {
       const matchSearch = i.name.includes(search);
-      const matchCat =
-        filterCat === "all" || i.category_id === Number(filterCat);
+      const matchCat = filterCat === "all" || i.category_id === Number(filterCat);
       return matchSearch && matchCat;
     });
   }, [items, search, filterCat]);
@@ -57,20 +56,20 @@ export default function Items() {
         </Button>
       </div>
 
-      <div className="flex gap-3 mb-4 flex-wrap">
+      <div className="flex gap-3 mb-4 flex-wrap bg-brand-card p-4 rounded-xl border border-brand-gold/20">
         <div className="relative flex-1 min-w-[200px]">
           <FiSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="بحث بالاسم..."
-            className="input-field pr-12"
+            className="input-field pr-12 py-2"
           />
         </div>
         <select
           value={filterCat}
           onChange={(e) => setFilterCat(e.target.value)}
-          className="input-field w-auto min-w-[180px]"
+          className="input-field w-auto min-w-[180px] py-2"
         >
           <option value="all">جميع الأقسام</option>
           {categories.map((c) => (
@@ -85,7 +84,7 @@ export default function Items() {
         <Spinner />
       ) : (
         <div className="card-glass overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[700px]">
             <thead className="bg-brand-gold/10 text-brand-gold">
               <tr>
                 <th className="p-4 text-right">الصنف</th>
@@ -103,85 +102,62 @@ export default function Items() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((i) => (
-                  <tr
-                    key={i.id}
-                    className="border-b border-white/5 hover:bg-white/5 transition"
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        {i.image_url ? (
-                          <img
-                            src={i.image_url}
-                            alt={i.name}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-lg bg-brand-card flex items-center justify-center text-xl">
-                            🍖
-                          </div>
-                        )}
-                        <div>
-                          <div className="font-bold text-white">{i.name}</div>
-                          <div className="text-xs text-gray-500 line-clamp-1">
-                            {i.description || "—"}
+                filtered.map((i) => {
+                  // هنا بنجيب بيانات القسم من الـ state باستخدام الـ ID
+                  const categoryObj = categories.find(c => c.id === i.category_id);
+                  const categoryName = categoryObj?.name || "—";
+                  const categoryIcon = categoryObj?.icon || "🍽️";
+
+                  return (
+                    <tr key={i.id} className="border-b border-white/5 hover:bg-white/5 transition">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          {i.image_url ? (
+                            <img src={i.image_url} alt={i.name} className="w-12 h-12 rounded-lg object-cover" />
+                          ) : (
+                            // هنا ظهرت الأيقونة بتاعة القسم
+                            <div className="w-12 h-12 rounded-lg bg-brand-maroon flex items-center justify-center text-2xl">
+                              {categoryIcon}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-white">{i.name}</div>
+                            <div className="text-xs text-gray-500 line-clamp-1">{i.description || "—"}</div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-gray-300">
-                      {categories.find((c) => c.id === i.category_id)?.name ||
-                        "—"}
-                    </td>
-                    <td className="p-4 text-brand-gold font-bold whitespace-nowrap">
-                      {i.price} ج.م
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          i.is_available
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-red-500/20 text-red-400"
-                        }`}
-                      >
-                        {i.is_available ? "متاح" : "غير متاح"}
-                      </span>
-                      {i.is_featured && (
-                        <span className="text-xs bg-brand-gold/20 text-brand-gold px-2 py-1 rounded mr-1">
-                          ⭐
+                      </td>
+                      <td className="p-4 text-gray-300">{categoryName}</td>
+                      <td className="p-4 text-brand-gold font-bold whitespace-nowrap">{i.price} ج.م</td>
+                      <td className="p-4">
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          i.is_available ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                        }`}>
+                          {i.is_available ? "متاح" : "غير متاح"}
                         </span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-1 justify-center">
-                        <button
-                          onClick={() => openEdit(i)}
-                          className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition"
-                        >
-                          <FiEdit2 />
-                        </button>
-                        <button
-                          onClick={() => remove(i.id)}
-                          className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        {i.is_featured && (
+                          <span className="text-xs bg-brand-gold/20 text-brand-gold px-2 py-1 rounded mr-1">⭐</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-1 justify-center">
+                          <button onClick={() => openEdit(i)} className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition">
+                            <FiEdit2 />
+                          </button>
+                          <button onClick={() => remove(i.id)} className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+                            <FiTrash2 />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       )}
 
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editing ? "تعديل صنف" : "صنف جديد"}
-        size="lg"
-      >
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "تعديل صنف" : "صنف جديد"} size="lg">
         <ItemForm
           initial={editing}
           categories={categories}
