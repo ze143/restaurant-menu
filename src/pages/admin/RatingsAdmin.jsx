@@ -10,13 +10,15 @@ export default function RatingsAdmin() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
+  const [deletingId, setDeletingId] = useState(null); // لمتابعة حالة الحذف
 
   async function load() {
     setLoading(true);
     let q = supabase.from("ratings").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("service_type", filter);
     if (search) q = q.ilike("customer_name", `%${search}%`);
-    const { data } = await q;
+    const { data, error } = await q;
+    if (error) console.error("Load error:", error);
     setRatings(data || []);
     setLoading(false);
   }
@@ -24,15 +26,45 @@ export default function RatingsAdmin() {
   useEffect(() => { load(); }, [filter, search]);
 
   async function remove(id) {
-    if (!confirm("حذف التقييم؟")) return;
-    await supabase.from("rating_details").delete().eq("rating_id", id);
-    const { error } = await supabase.from("ratings").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("تم الحذف");
-    load();
+    if (!confirm("هل أنت متأكد من حذف هذا التقييم نهائياً؟")) return;
+    
+    setDeletingId(id); // تعطيل الزرار أثناء الحذف
+    
+    try {
+      // 1. مسح التفاصيل المرتبطة (حتى لو مفيش تفاصيل مش هيضرب)
+      const { error: detailsError } = await supabase
+        .from("rating_details")
+        .delete()
+        .eq("rating_id", id);
+
+      if (detailsError) {
+        console.warn("مشكلة في مسح التفاصيل (يمكن مفيش تفاصيل):", detailsError);
+      }
+
+      // 2. مسح التقييم الأساسي
+      const { error: ratingError } = await supabase
+        .from("ratings")
+        .delete()
+        .eq("id", id);
+
+      if (ratingError) throw ratingError;
+
+      toast.success("تم حذف التقييم بنجاح");
+      
+      // 3. تحديث الجدول
+      await load(); 
+      
+      // 4. قفل المودال لو كان مفتوح على نفس التقييم
+      if (selected && selected.id === id) setSelected(null);
+
+    } catch (error) {
+      console.error("❌ Delete Error Details:", error);
+      toast.error("حدث خطأ أثناء الحذف: " + (error.message || "تأكد من الصلاحيات"));
+    } finally {
+      setDeletingId(null);
+    }
   }
 
-  // ترجمة أسماء الحقول للعربي
   const arabicLabels = {
     takeaway_cleanliness: "النظافة", takeaway_quality: "جودة الأكل", takeaway_packaging: "التغليف", takeaway_services: "الخدمات", takeaway_time: "الوقت",
     dinein_cleanliness: "نظافة الصالة", dinein_quality: "جودة الأكل", dinein_presentation: "التقديم", dinein_services: "الخدمات", dinein_time: "الوقت", dinein_comfort: "الإضاءة والتكييف", dinein_staff: "أسلوب الويتر",
@@ -98,8 +130,13 @@ export default function RatingsAdmin() {
                     <button onClick={() => setSelected(r)} className="p-2 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition" title="عرض">
                       <FiEye />
                     </button>
-                    <button onClick={() => remove(r.id)} className="p-2 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition" title="حذف">
-                      <FiTrash2 />
+                    <button 
+                      onClick={() => remove(r.id)} 
+                      disabled={deletingId === r.id}
+                      className={`p-2 rounded transition ${deletingId === r.id ? 'bg-gray-500/10 text-gray-500' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`} 
+                      title="حذف"
+                    >
+                      {deletingId === r.id ? <Spinner size="sm" text="" /> : <FiTrash2 />}
                     </button>
                   </div>
                 </td>
@@ -109,14 +146,12 @@ export default function RatingsAdmin() {
         </table>
       </div>
 
-      {/* مودال عرض تفاصيل التقييم */}
       {selected && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
           <div 
             className="bg-brand-dark border border-brand-gold/30 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* هيدر المودال */}
             <div className="sticky top-0 bg-brand-dark/95 backdrop-blur p-4 border-b border-brand-gold/20 flex justify-between items-center z-10">
               <h2 className="text-xl font-arabic text-brand-gold">تفاصيل تقييم: {selected.customer_name}</h2>
               <button onClick={() => setSelected(null)} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 text-gray-400">
@@ -125,7 +160,6 @@ export default function RatingsAdmin() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* معلومات أساسية */}
               <div className="flex flex-wrap gap-3 text-sm">
                 <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg">
                   الخدمة: {selected.service_type === 'takeaway' ? 'تيك أواي' : selected.service_type === 'dinein' ? 'صالة' : 'دليفري'}
@@ -138,7 +172,6 @@ export default function RatingsAdmin() {
                 </span>
               </div>
 
-              {/* تفاصيل النجوم */}
               {selected.rating_data && (
                 <div>
                   <h3 className="text-brand-gold font-bold mb-3 border-b border-white/10 pb-2">تقييم العناصر</h3>
@@ -160,7 +193,6 @@ export default function RatingsAdmin() {
                 </div>
               )}
 
-              {/* تعليق الزبون */}
               {selected.comment && (
                 <div>
                   <h3 className="text-brand-gold font-bold mb-2 border-b border-white/10 pb-2">رأي الزبون</h3>
@@ -170,7 +202,6 @@ export default function RatingsAdmin() {
                 </div>
               )}
 
-              {/* الاقتراحات (لو موجودة) */}
               {selected.rating_data?.general_suggestions && (
                 <div>
                   <h3 className="text-brand-gold font-bold mb-2 border-b border-white/10 pb-2">الاقتراحات</h3>
