@@ -254,7 +254,9 @@ export default function Home() {
         </div>
         <div className="flex items-center justify-center gap-2 text-lg text-gray-300">
           <FiPhone className="text-brand-gold" />
-          <span>01143709888 - 01150015782</span>
+          <span>01143709888</span>
+          <FiPhone className="text-brand-gold" />
+          <span>01150015782</span>
         </div>
       </section>
 
