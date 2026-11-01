@@ -7,6 +7,22 @@ export default function MenuCard({ item }) {
     ? Math.min(...item.variants.map(v => v.price)) 
     : item.price;
 
+  // دالة اختيار الإيموجي حسب اسم القسم (لو متاح)
+  const getCategoryIcon = (categoryName) => {
+    if (!categoryName) return "🍽️";
+    if (categoryName.includes("دجاج") || categoryName.includes("فراخ")) return "🍗";
+    if (categoryName.includes("مشويات") || categoryName.includes("لحوم")) return "🥩";
+    if (categoryName.includes("ساندوتش") || categoryName.includes("حواوشي")) return "🥙";
+    if (categoryName.includes("صواني") || categoryName.includes("وجبات")) return "🍱";
+    if (categoryName.includes("طواجن")) return "🍲";
+    if (categoryName.includes("مطبخ")) return "🍚";
+    if (categoryName.includes("سلطات") || categoryName.includes("مقبلات")) return "🥗";
+    return "🍽️";
+  };
+
+  // بنجيب اسم القسم سواء جاي من الـ Relation أو ممرر كـ Prop
+  const catName = item.menu_categories?.name || item.category_name;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,7 +36,10 @@ export default function MenuCard({ item }) {
           <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" loading="lazy" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-brand-maroon to-brand-dark flex items-center justify-center">
-            <span className="text-6xl opacity-50 group-hover:scale-110 transition">🍖</span>
+            {/* هنا بقى بنعرض الأيقونة حسب القسم */}
+            <span className="text-6xl opacity-50 group-hover:scale-110 transition">
+              {getCategoryIcon(catName)}
+            </span>
           </div>
         )}
         {item.is_featured && (
