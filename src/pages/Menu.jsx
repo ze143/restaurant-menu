@@ -19,50 +19,55 @@ export default function Menu() {
   const [activeCat, setActiveCat] = useState("all");
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState("default");
-  
-  // State للمكونات المختارة
   const [selectedIngredients, setSelectedIngredients] = useState([]);
 
-  // جلب المكونات الفريدة من الداتا بيز
   const allIngredients = useMemo(() => getUniqueIngredients(), [items]);
 
-  // الفلترة والترتيب
   const filtered = useMemo(() => {
     const searchTerms = query.trim().toLowerCase().split(" ").filter(Boolean);
 
     let result = items.filter((i) => {
-      // دمج الاسم + الوصف + المكونات في نص واحد
       const ingredientsText = i.ingredients ? i.ingredients.join(" ") : "";
-      const searchableText = `${i.name} ${i.description || ""} ${ingredientsText}`.toLowerCase();
-
+      const searchableText =
+        `${i.name} ${i.description || ""} ${ingredientsText}`.toLowerCase();
       const matchQuery = searchTerms.every((term) =>
         searchableText.includes(term),
       );
-
       const matchCat = activeCat === "all" || i.category_id === activeCat;
       const matchFeatured = showFeaturedOnly ? i.is_featured : true;
+      const itemIngredients = (i.ingredients || []).map((ing) =>
+        ing.toLowerCase(),
+      );
+      const matchIngredients =
+        selectedIngredients.length === 0 ||
+        selectedIngredients.every((selected) =>
+          itemIngredients.includes(selected.toLowerCase()),
+        );
 
-      // فلترة المكونات المختارة (لازم الصنف يكون فيه كل المكونات اللي اختارها الزبون)
-      const itemIngredients = (i.ingredients || []).map(ing => ing.toLowerCase());
-      const matchIngredients = selectedIngredients.length === 0 || 
-        selectedIngredients.every(selected => itemIngredients.includes(selected.toLowerCase()));
-
-      return matchQuery && matchCat && matchFeatured && matchIngredients && i.is_available;
+      return (
+        matchQuery &&
+        matchCat &&
+        matchFeatured &&
+        matchIngredients &&
+        i.is_available
+      );
     });
 
-    // الترتيب
-    if (sortOrder === "priceAsc") {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortOrder === "priceDesc") {
+    if (sortOrder === "priceAsc") result.sort((a, b) => a.price - b.price);
+    else if (sortOrder === "priceDesc")
       result.sort((a, b) => b.price - a.price);
-    } else {
-      result.sort((a, b) => a.sort_order - b.sort_order);
-    }
+    else result.sort((a, b) => a.sort_order - b.sort_order);
 
     return result;
-  }, [items, query, activeCat, showFeaturedOnly, sortOrder, selectedIngredients]);
+  }, [
+    items,
+    query,
+    activeCat,
+    showFeaturedOnly,
+    sortOrder,
+    selectedIngredients,
+  ]);
 
-  // تجميع الأصناف حسب القسم
   const grouped = useMemo(() => {
     const map = {};
     filtered.forEach((item) => {
@@ -72,12 +77,9 @@ export default function Menu() {
     return map;
   }, [filtered]);
 
-  // دالة للتعامل مع اختيار/إلغاء اختيار مكون
   const toggleIngredient = (ing) => {
     setSelectedIngredients((prev) =>
-      prev.includes(ing) 
-        ? prev.filter((item) => item !== ing) 
-        : [...prev, ing]
+      prev.includes(ing) ? prev.filter((item) => item !== ing) : [...prev, ing],
     );
   };
 
@@ -95,12 +97,10 @@ export default function Menu() {
           المنيو
         </motion.h1>
 
-        {/* شريط البحث */}
         <div className="mb-6">
           <SearchBar value={query} onChange={setQuery} />
         </div>
 
-        {/* المكونات الديناميكية (Checkboxes) */}
         {allIngredients.length > 0 && (
           <div className="mb-6 bg-brand-card p-4 rounded-2xl border border-brand-gold/20">
             <h3 className="text-sm text-brand-gold font-bold mb-3 flex items-center gap-2">
@@ -125,21 +125,17 @@ export default function Menu() {
                       onChange={() => toggleIngredient(ing)}
                     />
                     <div
-                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? "bg-brand-gold border-brand-gold"
-                          : "border-gray-500"
-                      }`}
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isSelected ? "bg-brand-gold border-brand-gold" : "border-gray-500"}`}
                     >
-                      {isSelected && <FiCheck className="text-brand-dark text-xs" />}
+                      {isSelected && (
+                        <FiCheck className="text-brand-dark text-xs" />
+                      )}
                     </div>
                     <span className="text-sm">{ing}</span>
                   </label>
                 );
               })}
             </div>
-            
-            {/* زرار مسح المكونات المختارة */}
             {selectedIngredients.length > 0 && (
               <button
                 onClick={() => setSelectedIngredients([])}
@@ -151,7 +147,6 @@ export default function Menu() {
           </div>
         )}
 
-        {/* شريط الفلاتر (الترتيب + المميز) */}
         <div className="flex flex-wrap gap-3 mb-6 items-center justify-between">
           <div className="flex gap-2 flex-wrap">
             <button
@@ -164,7 +159,6 @@ export default function Menu() {
             >
               <FiStar /> المميز فقط
             </button>
-
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
@@ -175,7 +169,6 @@ export default function Menu() {
               <option value="priceDesc">السعر: من الأعلى للأقل</option>
             </select>
           </div>
-
           <div className="text-sm text-gray-400">
             تم العثور على{" "}
             <span className="text-brand-gold font-bold">{filtered.length}</span>{" "}
@@ -183,7 +176,6 @@ export default function Menu() {
           </div>
         </div>
 
-        {/* أقسام المنيو */}
         <div className="mb-10">
           <CategoryNav
             categories={categories}
@@ -192,7 +184,6 @@ export default function Menu() {
           />
         </div>
 
-        {/* عرض الأصناف */}
         {loading ? (
           <Spinner size="lg" />
         ) : filtered.length === 0 ? (

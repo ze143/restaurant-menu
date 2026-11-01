@@ -20,7 +20,10 @@ export default function CategorySection({ category, items }) {
       </motion.h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
-          <MenuCard key={item.id} item={item} />
+          <MenuCard
+            key={item.id}
+            item={{ ...item, category_name: category.name }}
+          />
         ))}
       </div>
     </section>
