@@ -7,7 +7,7 @@ import {
   FiTruck,
   FiPhone,
   FiInstagram,
-  FiMessageCircle,
+  FiWhatsapp,
 } from "react-icons/fi";
 import { FaTiktok, FaFacebook } from "react-icons/fa";
 import Navbar from "../components/layout/Navbar";
@@ -236,7 +236,7 @@ export default function Home() {
             rel="noreferrer"
             className="w-14 h-14 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-2xl hover:scale-110 transition"
           >
-            <FiMessageCircle />
+            <FiWhatsapp />
           </a>
           <a
             href="https://www.tiktok.com/@abdelhayalkababji"
