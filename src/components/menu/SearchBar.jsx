@@ -7,7 +7,7 @@ export default function SearchBar({ value, onChange }) {
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="ابحث بالاسم أو بالمكونات (مثال: مشوي، جبنة، حار...)"
+        placeholder="ابحث بالاسم أو بالمكونات)"
         className="input-field pr-12 pl-12 py-4 text-lg border-2 border-brand-gold/30 focus:border-brand-gold shadow-lg"
       />
       {value && (
