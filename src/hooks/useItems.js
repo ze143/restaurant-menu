@@ -8,19 +8,15 @@ export function useItems() {
 
   async function fetch() {
     setLoading(true);
-    // استخدمنا * عشان نجيب كل الأعمدة (بما فيها variants و ingredients)
+    // الترتيب هنا: أولاً حسب القسم، ثم حسب الترتيب الداخلي للقسم
     const { data, error } = await supabase
       .from("menu_items")
       .select("*")
-      .order("sort_order");
+      .order("category_id", { ascending: true })
+      .order("sort_order", { ascending: true });
       
-    if (error) {
-      console.error("❌ Error fetching items:", error);
-      toast.error("حدث خطأ في جلب الأصناف");
-    } else {
-      // console.log("✅ Data fetched successfully:", data);
-      setItems(data || []);
-    }
+    if (error) console.error("Error fetching items:", error);
+    else setItems(data || []);
     setLoading(false);
   }
 
@@ -28,10 +24,7 @@ export function useItems() {
     const ext = file.name.split(".").pop();
     const path = `${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("menu-images").upload(path, file);
-    if (error) {
-        console.error("❌ Upload Error:", error);
-        throw error;
-    }
+    if (error) throw error;
     const { data } = supabase.storage.from("menu-images").getPublicUrl(path);
     return data.publicUrl;
   }
@@ -39,21 +32,8 @@ export function useItems() {
   async function create(values, imageFile) {
     let image_url = null;
     if (imageFile) image_url = await uploadImage(imageFile);
-    
-    // طباعة البيانات اللي رايحة للداتا بيز عشان نتأكد إن variants موجودة
-    console.log("📤 Creating with values:", { ...values, image_url });
-
-    const { error, data } = await supabase
-      .from("menu_items")
-      .insert([{ ...values, image_url }])
-      .select();
-
-    if (error) {
-      console.error("❌ Insert Error:", error);
-      return toast.error(error.message);
-    }
-    
-    console.log("✅ Insert Success:", data);
+    const { error } = await supabase.from("menu_items").insert([{ ...values, image_url }]);
+    if (error) return toast.error(error.message);
     toast.success("تم إضافة الصنف");
     fetch();
   }
@@ -61,22 +41,8 @@ export function useItems() {
   async function update(id, values, imageFile) {
     let payload = { ...values };
     if (imageFile) payload.image_url = await uploadImage(imageFile);
-    
-    // طباعة البيانات اللي رايحة للتعديل
-    console.log("📤 Updating with values:", payload);
-
-    const { error, data } = await supabase
-      .from("menu_items")
-      .update(payload)
-      .eq("id", id)
-      .select();
-
-    if (error) {
-      console.error("❌ Update Error:", error);
-      return toast.error(error.message);
-    }
-
-    console.log("✅ Update Success:", data);
+    const { error } = await supabase.from("menu_items").update(payload).eq("id", id);
+    if (error) return toast.error(error.message);
     toast.success("تم التعديل");
     fetch();
   }
@@ -84,12 +50,25 @@ export function useItems() {
   async function remove(id) {
     if (!confirm("حذف الصنف؟")) return;
     const { error } = await supabase.from("menu_items").delete().eq("id", id);
-    if (error) {
-        console.error("❌ Delete Error:", error);
-        return toast.error(error.message);
-    }
+    if (error) return toast.error(error.message);
     toast.success("تم الحذف");
     fetch();
+  }
+
+  async function updateSortOrder(id, newOrder) {
+    // تحديث مؤقت في الواجهة عشان يبان سريع
+    setItems(prev => 
+      prev.map(i => i.id === id ? { ...i, sort_order: newOrder } : i)
+           .sort((a, b) => a.category_id - b.category_id || a.sort_order - b.sort_order)
+    );
+
+    const { error } = await supabase.from("menu_items").update({ sort_order: newOrder }).eq("id", id);
+    if (error) {
+      toast.error("فشل حفظ الترتيب");
+      fetch(); // رجع البيانات القديمة لو فشل
+    } else {
+      fetch();
+    }
   }
 
   function getUniqueIngredients() {
@@ -105,6 +84,7 @@ export function useItems() {
     create, 
     update, 
     remove, 
+    updateSortOrder, 
     refetch: fetch, 
     getUniqueIngredients 
   };
